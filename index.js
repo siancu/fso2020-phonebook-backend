@@ -26,6 +26,12 @@ let persons = [
   }
 ]
 
+const generateId = () => {
+  const min = Math.ceil(10);
+  const max = Math.floor(1000000);
+  return Math.floor(Math.random() * (max - min + 1)) + min;
+}
+
 app.get('/info', (req, res) => {
   const response =
     `<p>Phonebook has info for ${persons.length} people</p>
@@ -54,6 +60,33 @@ app.delete('/api/persons/:id', (req, res) => {
   persons = persons.filter(p => p.id !== id)
 
   return res.status(204).end()
+})
+
+app.post('/api/persons', (req, res) => {
+  const body = req.body;
+
+  if (!body.number) {
+    return res.status(400).json({error: 'the phone number is missing'})
+  }
+
+  if (!body.name) {
+    return res.status(400).json({error: 'the name is missing'})
+  }
+
+  const hasName = persons.some(p => p.name === body.name)
+  if (hasName) {
+    return res.status(400).json({error: 'name must be unique'})
+  }
+
+  const person = {
+    name: body.name,
+    number: body.number,
+    id: generateId()
+  }
+
+  persons = persons.concat(person)
+
+  res.json(person)
 })
 
 const port = 3001
