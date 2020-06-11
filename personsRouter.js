@@ -42,22 +42,16 @@ const createPerson = async (req, res, next) => {
     return res.status(400).json({error: 'the name is missing'})
   }
 
-  const personsArray = await Person.find({ name: body.name})
-  const existingPerson = personsArray[0]
-  if (existingPerson) {
-    return updatePerson(req, res);
-  } else {
-    const person = new Person({
-      name: body.name,
-      number: body.number
-    })
+  const person = new Person({
+    name: body.name,
+    number: body.number
+  })
 
-    try {
-      const savedPerson = await person.save()
-      res.json(savedPerson.toJSON())
-    } catch (e) {
-      next(e)
-    }
+  try {
+    const savedPerson = await person.save()
+    res.json(savedPerson.toJSON())
+  } catch (e) {
+    next(e)
   }
 }
 
@@ -75,6 +69,5 @@ router.get('/:id', getPerson)
 router.delete('/:id', deletePerson)
 router.post('/', createPerson)
 router.put('/:id', updatePerson)
-
 
 module.exports = router
