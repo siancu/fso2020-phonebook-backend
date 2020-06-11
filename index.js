@@ -24,17 +24,23 @@ app.use(morgan((tokens, req, res) => {
   ].join(' ')
 }))
 
+const errorHandler = (error, request, response, next) => {
+  console.error(error.message)
+
+  if (error.name === 'CastError') {
+    return response.status(400).send({ error: 'malformatted id' })
+  } else if (error.name === 'ValidationError') {
+    return response.status(400).json({ error: error.message })
+  }
+
+  next(error)
+}
+
 app.use('/api/persons', personsRouter)
 
-app.get('/info', async (req, res) => {
-  const numberOfPersons = await Person.countDocuments({})
-  console.log(numberOfPersons)
-  const response =
-    `<p>Phonebook has info for ${numberOfPersons} people</p>
-     <p>${new Date().toString()}</p>
-    `
-  res.send(response)
-})
+// THIS HAS TO BE THE LAST THING BEFORE STARTING THE SERVER
+// IT IS CRAZY, I KNOW !!!
+app.use(errorHandler)
 
 const PORT = process.env.PORT
 app.listen(PORT, () => {

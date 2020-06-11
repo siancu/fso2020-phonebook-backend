@@ -31,7 +31,7 @@ const updatePerson = async (req, res, next) => {
   }
 }
 
-const createPerson = async (req, res) => {
+const createPerson = async (req, res, next) => {
   const body = req.body;
 
   if (!body.number) {
@@ -52,8 +52,12 @@ const createPerson = async (req, res) => {
       number: body.number
     })
 
-    const savedPerson = await person.save()
-    res.json(savedPerson)
+    try {
+      const savedPerson = await person.save()
+      res.json(savedPerson.toJSON())
+    } catch (e) {
+      next(e)
+    }
   }
 }
 
