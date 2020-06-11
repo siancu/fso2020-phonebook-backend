@@ -4,6 +4,8 @@ const morgan = require('morgan')
 const cors = require('cors')
 const Person = require('./models/person')
 
+const personsRouter = require('./personsRouter')
+
 const app = express()
 
 app.use(cors())
@@ -22,77 +24,16 @@ app.use(morgan((tokens, req, res) => {
   ].join(' ')
 }))
 
-const errorHandler = (error, req, res, next) => {
-  console.error(error.message)
+app.use('/api/persons', personsRouter)
 
-  if (error.name === 'CastError') {
-    return res.status(400).send({ error: 'malformatted id' })
-  }
-
-  next(error)
-}
-
-app.use(errorHandler)
-
-// REST API
-app.get('/info', (req, res) => {
+app.get('/info', async (req, res) => {
+  const numberOfPersons = await Person.countDocuments({})
+  console.log(numberOfPersons)
   const response =
-    `<p>Phonebook has info for ${persons.length} people</p>
+    `<p>Phonebook has info for ${numberOfPersons} people</p>
      <p>${new Date().toString()}</p>
     `
   res.send(response)
-})
-
-app.get('/api/persons', (req, res) => {
-  Person.find({}).then(persons => {
-    return res.json(persons)
-  })
-})
-
-app.get('/api/persons/:id', (req, res, next) => {
-  Person.findById(req.params.id)
-    .then(person => {
-      if (person) {
-        res.json(person)
-      } else {
-        res.status(404).end()
-      }
-    })
-    .catch(error => next(error))
-})
-
-app.delete('/api/persons/:id', (req, res, next) => {
-  Person.findByIdAndRemove(req.params.id)
-    .then(result => {
-      res.status(204).end()
-    })
-    .catch(error => next(error))
-})
-
-app.post('/api/persons', (req, res) => {
-  const body = req.body;
-
-  if (!body.number) {
-    return res.status(400).json({error: 'the phone number is missing'})
-  }
-
-  if (!body.name) {
-    return res.status(400).json({error: 'the name is missing'})
-  }
-
-  // const hasName = persons.some(p => p.name === body.name)
-  // if (hasName) {
-  //   return res.status(400).json({error: 'name must be unique'})
-  // }
-
-  const person = new Person({
-    name: body.name,
-    number: body.number
-  })
-
-  person.save().then(savedPerson => {
-    res.json(savedPerson)
-  })
 })
 
 const PORT = process.env.PORT
