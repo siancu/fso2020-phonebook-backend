@@ -10,8 +10,8 @@ const url = process.env.MONGODB_URI
 
 console.log('connecting to ', url)
 
-mongoose.connect(url, { useNewUrlParser: true, useUnifiedTopology: true})
-  .then(result => {
+mongoose.connect(url, { useNewUrlParser: true, useUnifiedTopology: true })
+  .then(() => {
     console.log('connected to MongoDB')
   })
   .catch((error) => {
@@ -34,6 +34,7 @@ const personSchema = new mongoose.Schema({
 personSchema.plugin(uniqueValidator)
 
 // don't return the __v and _id from Mongo
+// noinspection JSUnusedGlobalSymbols
 personSchema.set('toJSON', {
   transform: (document, returnedObject) => {
     returnedObject.id = returnedObject._id.toString()

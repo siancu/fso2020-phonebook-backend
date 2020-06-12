@@ -23,8 +23,8 @@ const getPerson = async (req, res, next) => {
 
 const updatePerson = async (req, res, next) => {
   try {
-    const body = req.body;
-    const person = await Person.findOneAndUpdate({name: body.name}, {number: body.number}, {new: true})
+    const body = req.body
+    const person = await Person.findOneAndUpdate({ name: body.name }, { number: body.number }, { new: true })
     res.json(person)
   } catch (e) {
     next(e)
@@ -32,14 +32,14 @@ const updatePerson = async (req, res, next) => {
 }
 
 const createPerson = async (req, res, next) => {
-  const body = req.body;
+  const body = req.body
 
   if (!body.number) {
-    return res.status(400).json({error: 'the phone number is missing'})
+    return res.status(400).json({ error: 'the phone number is missing' })
   }
 
   if (!body.name) {
-    return res.status(400).json({error: 'the name is missing'})
+    return res.status(400).json({ error: 'the name is missing' })
   }
 
   const person = new Person({
